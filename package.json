@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Basu008/Short-URL#readme",
   "dependencies": {
     "express": "^4.21.2",
+    "mongoose": "^8.10.1",
     "toml": "^3.0.0"
   }
 }
