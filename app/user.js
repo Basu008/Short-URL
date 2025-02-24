@@ -1,6 +1,7 @@
 const User = require("../model/user")
 const bcrypt = require("bcrypt")
 const { successResponse, errorResponse} = require("./response")
+const { createSessionID } = require("./user_session")
 
 async function createUser(req, res) {
     const {username, password} = req.body
@@ -41,9 +42,18 @@ async function loginUser(req, res) {
     }
     verifyPassword(password, user.password).then((isVerified) => {
         if (isVerified){
-            return successResponse(res, 200, true)
+            const ua = req.useragent
+            const device = ua.isMobile ? "Mobile" : ua.isTablet ? "Tablet" : "Desktop"
+            createSessionID(user._id, device).then((sessionID) => {
+                console.log(sessionID)
+                if (sessionID === ""){
+                    return errorResponse(res, 400, "unable to login please try again")
+                }
+                return successResponse(res, 200, sessionID)
+            })
+        }else{
+            return errorResponse(res, 400, "incorrect password")
         }
-        return errorResponse(res, 400, "incorrect password")
     })
 }
 

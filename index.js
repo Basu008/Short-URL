@@ -8,8 +8,10 @@ setupMongoDBConnection(connectionURL)
     .catch((err) => console.log("Error from MongoDB: ", err))  
 
 const express = require("express")
+const useragent = require("express-useragent")
 const app = express()
-app.use(express.json()) 
+app.use(express.json())
+app.use(useragent.express())
 
 //Setting up server
 const urlRoutes = require("./routes/url")
