@@ -1,7 +1,7 @@
 const { errorResponse } = require("../app/response")
 const { getUserID } = require("../app/user_session")
 
-async function handleUserAuthorisation(req, res, next) {
+async function handleUserAuthentication(req, res, next) {
     const sessionID = req.get("Authorization")
     if (!sessionID){
         return errorResponse(res, 401, "user should be logged in")
@@ -17,5 +17,5 @@ async function handleUserAuthorisation(req, res, next) {
 }
 
 module.exports = {
-    handleUserAuthorisation
+    handleUserAuthentication
 }
