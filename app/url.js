@@ -50,10 +50,20 @@ async function linkAnalytics(req, res){
     return successResponse(res, 200, responseBody)
 }
 
+async function getAllLinks(req, res){
+    const urls = await URL.find({
+        user_id:req.user_id
+    })
+    return successResponse(res, 200, urls)
+}
+
 function generateShortID(){
     return nanoid(config.url.shortIdLength)
 }
 
 module.exports = {
-    createShortURL,originalLink,linkAnalytics
+    createShortURL,
+    originalLink,
+    linkAnalytics,
+    getAllLinks
 }
