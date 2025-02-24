@@ -10,6 +10,7 @@ async function handleUserAuthorisation(req, res, next) {
         if (!userID){
             return errorResponse(res, 401, "session timed out! Log in again")
         }else{
+            req.user_id = userID
             next()
         }
     })

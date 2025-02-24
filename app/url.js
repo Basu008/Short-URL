@@ -13,6 +13,7 @@ async function createShortURL(req, res){
     const result = await URL.create({
         short_id: shortID,
         redirect_url: url,
+        user_id: req.user_id,
     })
     return successResponse(res, 201, result.short_id)
 }
@@ -38,7 +39,10 @@ async function linkAnalytics(req, res){
     if (!shortID){
         return errorResponse(res, 400, "id is a required field")
     }
-    const result = await URL.findOne({short_id:shortID})
+    const result = await URL.findOne({
+        short_id:shortID,
+        user_id:req.user_id
+        })
     const responseBody = {
         total_clicks: result.visit_history.length,
         click_timestamps:result.visit_history
