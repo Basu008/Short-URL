@@ -45,7 +45,6 @@ async function loginUser(req, res) {
             const ua = req.useragent
             const device = ua.isMobile ? "Mobile" : ua.isTablet ? "Tablet" : "Desktop"
             createSessionID(user._id, device).then((sessionID) => {
-                console.log(sessionID)
                 if (sessionID === ""){
                     return errorResponse(res, 400, "unable to login please try again")
                 }

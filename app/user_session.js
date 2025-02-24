@@ -17,6 +17,17 @@ async function createSessionID(userID, device){
     }
 }
 
+async function getUserID(sessionID){
+    const session = await UserSession.findOne({
+        session_id:sessionID
+    })
+    if (!session){
+        return null
+    }
+    return session.user_id
+}
+
 module.exports = {
-    createSessionID
+    createSessionID,
+    getUserID
 }
