@@ -1,6 +1,6 @@
 const User = require("../model/user")
 const { successResponse, errorResponse} = require("./response")
-const { createSessionID } = require("./user_session")
+const { signToken } = require("../server/auth/auth")
 
 async function createUser(req, res) {
     const {full_name, username, password} = req.body
@@ -29,16 +29,9 @@ async function loginUser(req, res) {
     const {username, password} = req.body
     try{
         User.validateUser(username, password).then((user) => {
-            const ua = req.useragent
-            const device = ua.isMobile ? "Mobile" : ua.isTablet ? "Tablet" : "Desktop"
-            console.log(user._id);
-            createSessionID(user._id, device).then((sessionID) => {
-                if (sessionID === ""){
-                    return errorResponse(res, 400, "unable to login please try again")
-                }
-                user._doc.session_id = sessionID
-                return successResponse(res, 200, {...user._doc, password:undefined})
-            })
+            token = signToken(user)
+            user._doc.token = token
+            return successResponse(res, 200, {...user._doc, password:undefined})
         })
     }catch(err){
         return errorResponse(res, 400, err)

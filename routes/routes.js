@@ -6,7 +6,7 @@ const redirectionRoutes = require("./redirection")
 const userRoutes = require("./user")
 const visitsRoutes = require("./visits")
 
-function setUpRouters(app){
+function setUpRoutes(app){
     app.use(Config.baseURL.url, handleUserAuthentication, urlRoutes)
     app.use(Config.baseURL.redirection, redirectionRoutes)
     app.use(Config.baseURL.user, userRoutes)
@@ -14,5 +14,5 @@ function setUpRouters(app){
 }
 
 module.exports = {
-    setUpRouters
+    setUpRoutes
 }
