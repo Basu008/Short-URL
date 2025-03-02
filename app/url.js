@@ -50,6 +50,11 @@ async function linkAnalytics(req, res){
     return successResponse(res, 200, responseBody)
 }
 
+// async function getLinkCounts(req, res){
+//     const count = await URL.countDocuments({user_id:req.user_id})
+//     return successResponse(res, 200, count)
+// }
+
 async function getAllLinks(req, res){
     const urls = await URL.find({
         user_id:req.user_id
@@ -65,5 +70,6 @@ module.exports = {
     createShortURL,
     originalLink,
     linkAnalytics,
-    getAllLinks
+    getAllLinks,
+    // getLinkCounts
 }

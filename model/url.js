@@ -1,5 +1,19 @@
 const mongoose = require("mongoose")
 
+// const visitorSchema = new mongoose.Schema({
+//     origin:{
+//         type:String,
+//     },
+//     device:{
+//         type:String
+//     }
+// },{
+//     timestamps:{
+//         createdAt:'created_at',
+//         updatedAt:'updated_at',
+//     }
+// })
+
 const urlSchema = new mongoose.Schema({
     short_id:{
         type:String,
@@ -14,10 +28,6 @@ const urlSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"users",
     },
-    visit_history:{
-        type:[Date],
-        default:[]
-    }
 },{
     timestamps:{
         createdAt:'created_at',
