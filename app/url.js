@@ -6,15 +6,28 @@ const { successResponse, errorResponse, redirectResponse} = require("./response"
 
 async function createShortURL(req, res){
     const url = req.body.url
+    const userID = req.user_id
     if (!url){
         return errorResponse(res, 400, "url is a required field")
     }
-    const result = await URL.create({
-        short_id:"id",
-        redirect_url: url,
-        user_id: req.user_id,
-    })
-    return successResponse(res, 201, result.short_id)
+    try {
+        const urlCount = await URL.countDocuments({user_id:userID})
+        if (urlCount >= Config.url.freeLimit){
+            return errorResponse(res, 400, "conversion limit exhausted. Upgrade to premium")
+        }
+    } catch (error) {
+        return errorResponse(res, 500, error)
+    }
+    try {
+        const result = await URL.create({
+            short_id:"id",
+            redirect_url: url,
+            user_id: userID,
+        })
+        return successResponse(res, 201, result.short_id)
+    } catch (error) {
+        return errorResponse(res, 500, error)
+    }
 }
 
 async function originalURL(req, res){
@@ -24,14 +37,21 @@ async function originalURL(req, res){
     if (!shortID){
         return errorResponse(res, 400, "short id missing")
     }
-    const url = await URL.findOne({short_id:shortID})
-    await Visit.create({
-        short_id: shortID,
-        user_id:url.user_id,
-        origin,
-        device
-    })
-    redirectResponse(res, url.redirect_url)
+    try {
+        const url = await URL.findOne({short_id:shortID})
+        if (!url){
+            return errorResponse(res, 400, "url doesn't exists")
+        }
+        await Visit.create({
+            short_id: shortID,
+            user_id:url.user_id,
+            origin,
+            device
+        })
+        redirectResponse(res, url.redirect_url)
+    } catch (error) {
+        return errorResponse(res, 500, error)
+    }
 }
 
 async function getAllURLs(req, res){
@@ -41,14 +61,31 @@ async function getAllURLs(req, res){
     if (page > 0){
         skip = page * limit
     }
-    const urls = await URL.find({
-        user_id:req.user_id
-    }).skip(skip).limit(limit)
-    return successResponse(res, 200, urls)
+    try{
+        const urls = await URL.find({
+            user_id:req.user_id
+        }).skip(skip).limit(limit)
+        return successResponse(res, 200, urls)
+    }catch(error){
+        return errorResponse(res, 500, error)
+    }
+}
+
+async function getURLsCount(req, res){
+    const userID = req.user_id
+    try {
+        const count = await URL.countDocuments({
+            user_id:userID
+        })
+        return successResponse(res, 200, count)
+    } catch (error) {
+        return errorResponse(res, 500, error)
+    }
 }
 
 module.exports = {
     createShortURL,
     originalURL,
     getAllURLs,
+    getURLsCount
 }
