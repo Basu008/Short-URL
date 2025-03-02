@@ -1,18 +1,7 @@
 const mongoose = require("mongoose")
+const {nanoid} = require("nanoid")
+const config = require("../server/config/config")
 
-// const visitorSchema = new mongoose.Schema({
-//     origin:{
-//         type:String,
-//     },
-//     device:{
-//         type:String
-//     }
-// },{
-//     timestamps:{
-//         createdAt:'created_at',
-//         updatedAt:'updated_at',
-//     }
-// })
 
 const urlSchema = new mongoose.Schema({
     short_id:{
@@ -35,6 +24,16 @@ const urlSchema = new mongoose.Schema({
     }
 })
 
+urlSchema.pre('save', function (next){
+    const shortID = generateShortID()
+    this.short_id = shortID
+    next()
+})
+
 const URL = mongoose.model('url', urlSchema)
+
+function generateShortID(){
+    return nanoid(config.url.shortIdLength)
+}
 
 module.exports = URL

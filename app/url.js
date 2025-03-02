@@ -1,17 +1,18 @@
-const config = require("../server/config/config")
 const URL = require("../model/url")
-const {nanoid} = require("nanoid")
+const Visit = require("../model/visit")
 const { successResponse, errorResponse, redirectResponse} = require("./response")
 
 
 async function createShortURL(req, res){
+    if (!req.user_id){
+        return errorResponse(res, 401, "user not logged in")
+    }
     const url = req.body.url
     if (!url){
         return errorResponse(res, 400, "url is a required field")
     }
-    const shortID = generateShortID()
     const result = await URL.create({
-        short_id: shortID,
+        short_id:"id",
         redirect_url: url,
         user_id: req.user_id,
     })
@@ -20,35 +21,36 @@ async function createShortURL(req, res){
 
 async function originalLink(req, res){
     const shortID = req.params.shortID
+    const origin = req.query.origin
+    const device = req.query.device
     if (!shortID){
         return errorResponse(res, 400, "short id missing")
     }
-    const entry = await URL.findOneAndUpdate(
-        {
-            short_id:shortID
-        },{
-            $push:{
-                visit_history:Date.now()
-            }
-        })
-    redirectResponse(res, entry.redirect_url)
+    const url = await URL.findOne({short_id:shortID})
+    const visitCreated = await Visit.create({
+        short_id: shortID,
+        user_id:url.user_id,
+        origin,
+        device
+    })
+    redirectResponse(res, url.redirect_url)
 }
 
-async function linkAnalytics(req, res){
-    const shortID = req.params.shortID
-    if (!shortID){
-        return errorResponse(res, 400, "id is a required field")
-    }
-    const result = await URL.findOne({
-        short_id:shortID,
-        user_id:req.user_id
-        })
-    const responseBody = {
-        total_clicks: result.visit_history.length,
-        click_timestamps:result.visit_history
-    }
-    return successResponse(res, 200, responseBody)
-}
+// async function linkAnalytics(req, res){
+//     const shortID = req.params.shortID
+//     if (!shortID){
+//         return errorResponse(res, 400, "id is a required field")
+//     }
+//     const result = await URL.findOne({
+//         short_id:shortID,
+//         user_id:req.user_id
+//         })
+//     const responseBody = {
+//         total_clicks: result.visit_history.length,
+//         click_timestamps:result.visit_history
+//     }
+//     return successResponse(res, 200, responseBody)
+// }
 
 // async function getLinkCounts(req, res){
 //     const count = await URL.countDocuments({user_id:req.user_id})
@@ -62,14 +64,10 @@ async function getAllLinks(req, res){
     return successResponse(res, 200, urls)
 }
 
-function generateShortID(){
-    return nanoid(config.url.shortIdLength)
-}
-
 module.exports = {
     createShortURL,
     originalLink,
-    linkAnalytics,
+    // linkAnalytics,
     getAllLinks,
     // getLinkCounts
 }

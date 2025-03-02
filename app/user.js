@@ -36,7 +36,7 @@ async function loginUser(req, res) {
                 if (sessionID === ""){
                     return errorResponse(res, 400, "unable to login please try again")
                 }
-                user.session_id = sessionID
+                user._doc.session_id = sessionID
                 return successResponse(res, 200, {...user._doc, password:undefined})
             })
         })
