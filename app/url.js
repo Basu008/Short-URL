@@ -1,5 +1,6 @@
 const URL = require("../model/url")
 const Visit = require("../model/visit")
+const Config = require("../server/config/config")
 const { successResponse, errorResponse, redirectResponse} = require("./response")
 
 
@@ -19,7 +20,7 @@ async function createShortURL(req, res){
     return successResponse(res, 201, result.short_id)
 }
 
-async function originalLink(req, res){
+async function originalURL(req, res){
     const shortID = req.params.shortID
     const origin = req.query.origin
     const device = req.query.device
@@ -27,7 +28,7 @@ async function originalLink(req, res){
         return errorResponse(res, 400, "short id missing")
     }
     const url = await URL.findOne({short_id:shortID})
-    const visitCreated = await Visit.create({
+    await Visit.create({
         short_id: shortID,
         user_id:url.user_id,
         origin,
@@ -57,17 +58,26 @@ async function originalLink(req, res){
 //     return successResponse(res, 200, count)
 // }
 
-async function getAllLinks(req, res){
+async function getAllURLs(req, res){
+    if (!req.user_id){
+        return errorResponse(res, 401, "user not logged in")
+    }
+    const page = Number(req.query.page)
+    const limit = Config.app.pageLimit
+    const skip = 0
+    if (page > 0){
+        skip = page * limit
+    }
     const urls = await URL.find({
         user_id:req.user_id
-    })
+    }).skip(skip).limit(limit)
     return successResponse(res, 200, urls)
 }
 
 module.exports = {
     createShortURL,
-    originalLink,
+    originalURL,
     // linkAnalytics,
-    getAllLinks,
+    getAllURLs,
     // getLinkCounts
 }
