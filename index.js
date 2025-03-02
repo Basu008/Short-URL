@@ -17,8 +17,12 @@ app.use(useragent.express())
 //Setting up server
 const { handleUserAuthentication } = require("./middleware/auth")
 const urlRoutes = require("./routes/url")
+const redirectionRoutes = require("./routes/redirection")
 const userRoutes = require("./routes/user")
+const visitsRoutes = require("./routes/visits")
 app.use(Config.baseURL.url, handleUserAuthentication, urlRoutes)
+app.use(Config.baseURL.redirection, redirectionRoutes)
 app.use(Config.baseURL.user, userRoutes)
+app.use(Config.baseURL.visits,handleUserAuthentication, visitsRoutes)
 const PORT = Config.server.port
 app.listen(PORT, () => {console.log(`Started server at localhost:${PORT}`)})

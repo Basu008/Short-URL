@@ -4,7 +4,7 @@ const { getUserID } = require("../app/user_session")
 async function handleUserAuthentication(req, res, next) {
     const sessionID = req.get("Authorization")
     if (!sessionID){
-        return next()
+        return errorResponse(res, 401, "user should be logged in")
     }
     getUserID(sessionID).then((userID) => {
         if (!userID){

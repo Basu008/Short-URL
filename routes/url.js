@@ -1,10 +1,9 @@
 const express = require("express")
 const router = express.Router()
-const {createShortURL, originalURL, linkAnalytics, getAllURLs} = require("../app/url")
+const {createShortURL, getAllURLs} = require("../app/url")
 
-router.post("/url",createShortURL)
-router.get("/urls",getAllURLs)
-router.get("/url/:shortID",originalURL)
-
+router.route("/")
+    .get(getAllURLs)
+    .post(createShortURL)
 
 module.exports = router
