@@ -1,10 +1,9 @@
 const User = require("../model/user")
-const bcrypt = require("bcrypt")
 const { successResponse, errorResponse} = require("./response")
 const { createSessionID } = require("./user_session")
 
 async function createUser(req, res) {
-    const {username, password} = req.body
+    const {full_name, username, password} = req.body
     if (!username){
         return errorResponse(res, 400, "username is a required field")
     }
@@ -17,43 +16,33 @@ async function createUser(req, res) {
     if (!isPasswordValid(password)){
         return errorResponse(res, 400, "password is not strong enough")
     }
-    hashPassword(password).then(async (encryptedPassword) => {
-        const result = await User.create({
-                user_name:username,
-                password: encryptedPassword
-            })
-        return successResponse(res, 201, result._id)
+    const result = await User.create({
+        username,
+        password,
+        full_name,
     })
+    // The passoword is hashed -> check ./model/user.js
+    return successResponse(res, 201, result._id)
 }
 
 async function loginUser(req, res) {
     const {username, password} = req.body
-    if (!username){
-        return errorResponse(res, 400, "username is a required field")
-    }
-    if (!password){
-        return errorResponse(res, 400, "password is a required field")
-    }
-    const user = await User.findOne({
-        user_name: username
-    })
-    if (!user){
-        return errorResponse(res, 400, "invalid username")
-    }
-    verifyPassword(password, user.password).then((isVerified) => {
-        if (isVerified){
+    try{
+        User.validateUser(username, password).then((user) => {
             const ua = req.useragent
             const device = ua.isMobile ? "Mobile" : ua.isTablet ? "Tablet" : "Desktop"
+            console.log(user._id);
             createSessionID(user._id, device).then((sessionID) => {
                 if (sessionID === ""){
                     return errorResponse(res, 400, "unable to login please try again")
                 }
-                return successResponse(res, 200, sessionID)
+                user.session_id = sessionID
+                return successResponse(res, 200, {...user._doc, password:undefined})
             })
-        }else{
-            return errorResponse(res, 400, "incorrect password")
-        }
-    })
+        })
+    }catch(err){
+        return errorResponse(res, 400, err)
+    }
 }
 
 //Helper functions
@@ -67,15 +56,6 @@ function isPasswordValid(password){
     return regex.test(password)
 }
 
-async function hashPassword(password){
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    return hashedPassword;
-}
-
-async function verifyPassword(inputPassword, hashedPassword ){
-    return await bcrypt.compare(inputPassword, hashedPassword)
-}
 
 module.exports = {
     createUser,
