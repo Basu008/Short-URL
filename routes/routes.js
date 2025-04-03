@@ -1,4 +1,5 @@
 const Config = require("../server/config/config")
+const { successResponse} = require("../app/response")
 
 const { handleUserAuthentication } = require("../middleware/auth")
 const urlRoutes = require("./url")
@@ -13,6 +14,14 @@ function setUpRoutes(app){
     app.use(Config.baseURL.visits,handleUserAuthentication, visitsRoutes)
 }
 
+function setUpHealthCheck(app){
+    app.get("/health-check", createUser)
+}
+
+function createUser(req, res) {
+    return successResponse(res, 200, true)
+}
+
 module.exports = {
-    setUpRoutes
+    setUpRoutes,setUpHealthCheck
 }
