@@ -15,10 +15,10 @@ function setUpRoutes(app){
 }
 
 function setUpHealthCheck(app){
-    app.get("/api/health-check", createUser)
+    app.get("/api/health-check", healthCheck)
 }
 
-function createUser(req, res) {
+function healthCheck(req, res) {
     return successResponse(res, 200, true)
 }
 
