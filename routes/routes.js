@@ -15,7 +15,7 @@ function setUpRoutes(app){
 }
 
 function setUpHealthCheck(app){
-    app.get("/health-check", createUser)
+    app.get("/api/health-check", createUser)
 }
 
 function createUser(req, res) {
