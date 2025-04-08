@@ -3,6 +3,7 @@ const Visit = require("../model/visit")
 const Config = require("../server/config/config")
 const { successResponse, errorResponse, redirectResponse} = require("./response")
 
+const geoip = require('geoip-country');
 
 async function createShortURL(req, res){
     const url = req.body.url
@@ -32,8 +33,8 @@ async function createShortURL(req, res){
 
 async function originalURL(req, res){
     const shortID = req.params.shortID
-    const origin = req.query.origin
-    const device = req.query.device
+    const origin = getCountryFromRequest(req)
+    const device = req.device.type
     if (!shortID){
         return errorResponse(res, 400, "short id missing")
     }
@@ -81,6 +82,12 @@ async function getURLsCount(req, res){
     } catch (error) {
         return errorResponse(res, 500, error)
     }
+}
+
+function getCountryFromRequest(req) {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const geo = geoip.lookup(ip);
+    return geo ? geo.country : 'Unknown';
 }
 
 module.exports = {
