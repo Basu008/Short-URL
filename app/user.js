@@ -30,15 +30,17 @@ async function createUser(req, res) {
 
 async function loginUser(req, res) {
     const {username, password} = req.body
-    try{
-        User.validateUser(username, password).then((user) => {
-            token = signToken(user)
-            user._doc.token = token
-            return successResponse(res, 200, {...user._doc, password:undefined})
-        })
-    }catch(err){
-        return errorResponse(res, 400, err)
+    if (!username){
+        return errorResponse(res, 400, "username is a required field")
     }
+    if (!password){
+        return errorResponse(res, 400, "password is a required field")
+    }
+    User.validateUser(username, password).then((user) => {
+        token = signToken(user)
+        user._doc.token = token
+        return successResponse(res, 200, {...user._doc, password:undefined})
+    }).catch((err) => errorResponse(res, 400, err.message))
 }
 
 //Helper functions
