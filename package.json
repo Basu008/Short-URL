@@ -1,6 +1,6 @@
 {
   "name": "short-url",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Node JS library to help you create short url and track clicks",
   "main": "app.js",
   "scripts": {
