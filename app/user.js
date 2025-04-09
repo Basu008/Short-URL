@@ -4,6 +4,9 @@ const { signToken } = require("../server/auth/auth")
 
 async function createUser(req, res) {
     const {full_name, username, password} = req.body
+    if (!full_name){
+        return errorResponse(res, 400, "full_name is a required field")
+    }
     if (!username){
         return errorResponse(res, 400, "username is a required field")
     }
