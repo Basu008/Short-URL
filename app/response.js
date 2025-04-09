@@ -8,7 +8,7 @@ function successResponse(res, code, data){
 function errorResponse(res, code, errMsg){
     return res.status(code).json({
         success:false,
-        payload:errMsg
+        error:errMsg
     })
 }
 

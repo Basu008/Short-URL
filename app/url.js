@@ -17,7 +17,7 @@ async function createShortURL(req, res){
             return errorResponse(res, 400, "conversion limit exhausted. Upgrade to premium")
         }
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
     try {
         const result = await URL.create({
@@ -27,7 +27,7 @@ async function createShortURL(req, res){
         })
         return successResponse(res, 201, result.short_id)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
@@ -51,7 +51,7 @@ async function originalURL(req, res){
         })
         redirectResponse(res, url.redirect_url)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
@@ -68,7 +68,7 @@ async function getAllURLs(req, res){
         }).skip(skip).limit(limit)
         return successResponse(res, 200, urls)
     }catch(error){
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
@@ -80,7 +80,7 @@ async function getURLsCount(req, res){
         })
         return successResponse(res, 200, count)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 

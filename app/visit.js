@@ -22,7 +22,7 @@ async function getVisitsCount(req, res) {
         const count = await Visit.countDocuments(filter)
         return successResponse(res, 200, count)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
@@ -49,7 +49,7 @@ async function getVisits(req, res){
         const visits = await Visit.find(filter).skip(skip).limit(limit)
         return successResponse(res, 200, visits)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
@@ -78,7 +78,7 @@ async function getURLVisits(req, res){
         const visits = await Visit.find(filter).skip(skip).limit(limit)
         return successResponse(res, 200, visits)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
@@ -93,7 +93,7 @@ async function getURLVisitsCount(req, res) {
         const visits = await Visit.countDocuments(filter)
         return successResponse(res, 200, visits)
     } catch (error) {
-        return errorResponse(res, 500, error)
+        return errorResponse(res, 500, error.message)
     }
 }
 
