@@ -8,12 +8,13 @@ const geoip = require('geoip-country');
 async function createShortURL(req, res){
     const url = req.body.url
     const userID = req.user_id
+    const plan = req.plan
     if (!url){
         return errorResponse(res, 400, "url is a required field")
     }
     try {
         const urlCount = await URL.countDocuments({user_id:userID})
-        if (urlCount >= Config.url.freeLimit){
+        if (urlCount >= Config.url.freeLimit && plan === "FREE"){
             return errorResponse(res, 400, "conversion limit exhausted. Upgrade to premium")
         }
     } catch (error) {
@@ -56,6 +57,7 @@ async function originalURL(req, res){
 }
 
 async function getAllURLs(req, res){
+    const userID = req.user_id
     const page = parseInt(req.query.page) || 0
     const limit = Config.app.pageLimit
     var skip = 0
@@ -64,7 +66,7 @@ async function getAllURLs(req, res){
     }
     try{
         const urls = await URL.find({
-            user_id:req.user_id
+            user_id:userID
         }).skip(skip).limit(limit)
         return successResponse(res, 200, urls)
     }catch(error){

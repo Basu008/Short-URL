@@ -9,7 +9,7 @@ async function handleUserAuthentication(req, res, next) {
     const encodedToken = authToken.split("Bearer ")[1]
     try {
         const payload = verifyToken(encodedToken)
-        req.user_id = payload.user_id
+        req.user_id = payload.id
         req.plan = payload.plan
         next()
     } catch (error) {

@@ -3,34 +3,9 @@ const { successResponse, errorResponse} = require("./response")
 const { signToken } = require("../server/auth/auth")
 const Config = require("../server/config/config")
 
-async function createUser(req, res) {
-    const {full_name, username, password, phone} = req.body
-    User.create({
-        username,
-        password,
-        full_name,
-        phone
-    }).then((result) => {
-        return successResponse(res, 201, result._id)
-    }).catch((err) => errorResponse(res, 500, err.message))
-}
-
-async function loginUser(req, res) {
-    const {username, password} = req.body
-    if (!username){
-        return errorResponse(res, 400, "username is a required field")
-    }
-    if (!password){
-        return errorResponse(res, 400, "password is a required field")
-    }
-    User.validateUser(username, password).then((user) => {
-        user._doc.token = signToken(user)
-        return successResponse(res, 200, {...user._doc, password:undefined, __v:undefined})
-    }).catch((err) => errorResponse(res, 400, err.message))
-}
-
 async function updateUser(req, res) {
     const userID = req.user_id
+    const updateData = req.body
     const allowedPlans = Config.app.allowedPlans
     const updates = {};
     if (updateData.full_name) {
@@ -38,7 +13,7 @@ async function updateUser(req, res) {
     }
     if (updateData.plan) {
         if (!allowedPlans.includes(updateData.plan)) {
-            return errorResponse(res, 400, plansAsString())
+            return errorResponse(res, 400, `plan can be ${plansAsString()}`)
         }
         updates.plan = updateData.plan;
     }
@@ -52,9 +27,25 @@ async function updateUser(req, res) {
         { new: true, runValidators: true } // new: true returns updated doc
     );
     if (!updatedUser) {
-        throw errorResponse(res, 400, "no user found")
+        return errorResponse(res, 400, "no user found")
     }
+    updatedUser._doc.token = signToken(updatedUser)
     successResponse(res, 200, {...updatedUser._doc, password:undefined, __v:undefined})
+}
+
+async function getUser(req, res) {
+    const userID = req.user_id
+    User.findById(
+        userID,
+    ).then(user => {
+        if (!user){
+            return errorResponse(res, 400, "no user found")
+        }
+        user._doc.token = signToken(user)
+        return successResponse(res, 200, {...user._doc, password:undefined, __v:undefined})
+    }).catch(err => {
+        errorResponse(res, 500, err.message)
+    })
 }
 
 function plansAsString() {
@@ -69,6 +60,6 @@ function plansAsString() {
 }
 
 module.exports = {
-    createUser,
-    loginUser
+    getUser,
+    updateUser
 }
