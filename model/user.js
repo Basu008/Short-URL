@@ -6,11 +6,13 @@ const userSchema = new mongoose.Schema({
     username:{
         type:String,
         required:true,
-        unique:true
+        unique:true,
+        match:/^[a-zA-Z0-9@._]{5,30}$/,
     },
     password:{
         type:String,
-        required:true
+        required:true,
+        match:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
     },
     full_name:{
         type:String,
@@ -20,6 +22,18 @@ const userSchema = new mongoose.Schema({
        type:String,
        enum:["FREE","PREMIUM"],
        default:"FREE" 
+    },
+    phone: {
+        country_code: {
+            type: String,
+            required: true,
+            match: /^\+\d{1,4}$/
+        },
+        number: {
+            type: String,
+            required: true,
+            match: /^\d{6,14}$/
+        }
     }
 }, {
     timestamps:{
