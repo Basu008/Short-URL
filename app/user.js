@@ -24,7 +24,7 @@ async function updateUser(req, res) {
     const updatedUser = await User.findByIdAndUpdate(
         userID,
         { $set: updates },
-        { new: true, runValidators: true } // new: true returns updated doc
+        { new: true, runValidators: true }
     );
     if (!updatedUser) {
         return errorResponse(res, 400, "no user found")

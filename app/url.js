@@ -42,7 +42,10 @@ async function originalURL(req, res){
     try {
         const url = await URL.findOne({short_id:shortID})
         if (!url){
-            return errorResponse(res, 400, "url doesn't exists")
+            return errorResponse(res, 400, "short url doesn't exists")
+        }
+        if (url.is_deleted){
+            return errorResponse(res, 400, "short url deleted")
         }
         await Visit.create({
             short_id: shortID,
@@ -86,6 +89,27 @@ async function getURLsCount(req, res){
     }
 }
 
+async function deleteURL(req, res){
+    const userID = req.user_id
+    const shortID = req.params.shortID
+    const url = `${req.hostname}/${shortID}`
+    URL.updateOne(
+        {user_id:userID,short_id:shortID},
+        {$set:{is_deleted:true}}
+    ).then(result => {
+        if (result.matchedCount == 0){
+            return errorResponse(res, 400, `${url} doesn't exists`)
+        }else if (result.modifiedCount == 0){
+            return errorResponse(res, 400, `${url} already deleted`)
+        }
+        else {
+            return successResponse(res, 200, `successfully deleted ${url}`)
+        }
+    }).catch(err => {
+        return errorResponse(res, 500, err.message)
+    })
+}
+
 function getCountryFromRequest(req) {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     const geo = geoip.lookup(ip);
@@ -96,5 +120,6 @@ module.exports = {
     createShortURL,
     originalURL,
     getAllURLs,
-    getURLsCount
+    getURLsCount,
+    deleteURL
 }

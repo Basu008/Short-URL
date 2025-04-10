@@ -17,6 +17,10 @@ const urlSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"users",
     },
+    is_deleted:{
+        type:Boolean,
+        default:false
+    }
 },{
     timestamps:{
         createdAt:'created_at',
