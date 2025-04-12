@@ -12,6 +12,9 @@ async function createShortURL(req, res){
     if (!url){
         return errorResponse(res, 400, "url is a required field")
     }
+    if (!isValidUrl(url)){
+        return errorResponse(res, 400, "invalid url")
+    }
     try {
         const urlCount = await URL.countDocuments({user_id:userID})
         if (urlCount >= Config.url.freeLimit && plan === "FREE"){
@@ -114,6 +117,11 @@ function getCountryFromRequest(req) {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     const geo = geoip.lookup(ip);
     return geo ? geo.country : 'Unknown';
+}
+
+function isValidUrl(url) {
+    const regex = /^(https?:\/\/)[\w.-]+\.[a-z]{2,}([/?].*)?$/i;
+    return regex.test(url);
 }
 
 module.exports = {
