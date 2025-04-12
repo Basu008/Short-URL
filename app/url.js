@@ -72,7 +72,8 @@ async function getAllURLs(req, res){
     }
     try{
         const urls = await URL.find({
-            user_id:userID
+            user_id:userID,
+            is_deleted:false
         }).skip(skip).limit(limit)
         return successResponse(res, 200, urls)
     }catch(error){
