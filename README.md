@@ -27,6 +27,9 @@ A backend service that allows users to convert long URLs into short, easily shar
    git clone https://github.com/Basu008/Short-URL.git
    cd Short-URL
 
+2. **Installing dependency:**
+    npm install
+
 2. **Setting up config file:**
     - Go to conf folder in root directory
     - create a new file as default.toml
