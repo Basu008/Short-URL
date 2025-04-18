@@ -1,6 +1,6 @@
 # 🔗 Short-URL
 
-A simple and efficient URL shortener service built in **Node.JS**. This service takes a long URL and generates a shorter, more manageable version using unique short codes, similar to services like bit.ly or tinyurl.
+A backend service that allows users to convert long URLs into short, easily shareable links. Along with shortening, the service provides tracking features that let users monitor the number of visits, the countries of origin, and the devices used by visitors.
 
 ## ✨ Features
 
