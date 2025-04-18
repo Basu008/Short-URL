@@ -20,7 +20,7 @@ A backend service that allows users to convert long URLs into short, easily shar
 - **Routing:** Express
 - **UUID:** For generating unique short IDs
 
-## 📦 How the code works?
+## 🧪 Getting Started
 
 1. **Clone the repository:**
 
