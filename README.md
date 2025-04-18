@@ -30,12 +30,12 @@ A backend service that allows users to convert long URLs into short, easily shar
 2. **Installing dependency:**
     npm install
 
-2. **Setting up config file:**
+3. **Setting up config file:**
     - Go to conf folder in root directory
     - create a new file as default.toml
     - refer to example.toml and add configuration as per your need.
 
-3. **Running Code:**
+4. **Running Code:**
     - **For dev environment:** npm run dev
     - **For production environment:** npm start
 
