@@ -39,3 +39,5 @@ A backend service that allows users to convert long URLs into short, easily shar
     - **For dev environment:** npm run dev
     - **For production environment:** npm start
 
+5. **Sanity Check**
+    Hit GET {{baseURL}}/api/health-check. If everything is working fine, you should get `true` in payload
