@@ -11,7 +11,10 @@ async function createUser(req, res) {
         phone
     }).then((result) => {
         return successResponse(res, 201, result._id)
-    }).catch((err) => errorResponse(res, 500, err.message))
+    }).catch((err) => {
+        console.log("error creating user: ", err.message)
+        errorResponse(res, 500, err.message)
+    })
 }
 
 async function loginUser(req, res) {
