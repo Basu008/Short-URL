@@ -12,7 +12,6 @@ async function createUser(req, res) {
     }).then((result) => {
         return successResponse(res, 201, result._id)
     }).catch((err) => {
-        console.log("error creating user: ", err.message)
         errorResponse(res, 500, err.message)
     })
 }
@@ -29,7 +28,6 @@ async function loginUser(req, res) {
         user._doc.token = signToken(user)
         return successResponse(res, 200, {...user._doc, password:undefined, __v:undefined})
     }).catch((err) => {
-        console.error("Login error:", err.message)
         errorResponse(res, 400, err.message)
     })
 }
