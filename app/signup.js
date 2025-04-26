@@ -4,7 +4,7 @@ const { signToken } = require("../server/auth/auth")
 
 async function createUser(req, res) {
     const {full_name, username, password, phone} = req.body
-    User.create({
+    await User.create({
         username,
         password,
         full_name,
@@ -25,10 +25,13 @@ async function loginUser(req, res) {
     if (!password){
         return errorResponse(res, 400, "password is a required field")
     }
-    User.validateUser(username, password).then((user) => {
+    await User.validateUser(username, password).then((user) => {
         user._doc.token = signToken(user)
         return successResponse(res, 200, {...user._doc, password:undefined, __v:undefined})
-    }).catch((err) => errorResponse(res, 400, err.message))
+    }).catch((err) => {
+        console.error("Login error:", err.message)
+        errorResponse(res, 400, err.message)
+    })
 }
 
 module.exports = {
