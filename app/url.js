@@ -1,23 +1,23 @@
 const URL = require("../model/url")
 const Visit = require("../model/visit")
 const Config = require("../server/config/config")
-const { successResponse, errorResponse, redirectResponse} = require("./response")
+const { successResponse, errorResponse, redirectResponse } = require("./response")
 
 const geoip = require('geoip-country');
 
-async function createShortURL(req, res){
+async function createShortURL(req, res) {
     const url = req.body.url
     const userID = req.user_id
     const plan = req.plan
-    if (!url){
+    if (!url) {
         return errorResponse(res, 400, "url is a required field")
     }
-    if (!isValidUrl(url)){
+    if (!isValidUrl(url)) {
         return errorResponse(res, 400, "invalid url")
     }
     try {
-        const urlCount = await URL.countDocuments({user_id:userID})
-        if (urlCount >= Config.url.freeLimit && plan === "FREE"){
+        const urlCount = await URL.countDocuments({ user_id: userID })
+        if (urlCount >= Config.url.freeLimit && plan === "FREE") {
             return errorResponse(res, 400, "conversion limit exhausted. Upgrade to premium")
         }
     } catch (error) {
@@ -25,7 +25,7 @@ async function createShortURL(req, res){
     }
     try {
         const result = await URL.create({
-            short_id:"id",
+            short_id: "id",
             redirect_url: url,
             user_id: userID,
         })
@@ -35,24 +35,24 @@ async function createShortURL(req, res){
     }
 }
 
-async function originalURL(req, res){
+async function originalURL(req, res) {
     const shortID = req.params.shortID
     const origin = getCountryFromRequest(req)
     const device = req.device.type
-    if (!shortID){
+    if (!shortID) {
         return errorResponse(res, 400, "short id missing")
     }
     try {
-        const url = await URL.findOne({short_id:shortID})
-        if (!url){
+        const url = await URL.findOne({ short_id: shortID })
+        if (!url) {
             return errorResponse(res, 400, "short url doesn't exists")
         }
-        if (url.is_deleted){
+        if (url.is_deleted) {
             return errorResponse(res, 400, "short url deleted")
         }
         await Visit.create({
             short_id: shortID,
-            user_id:url.user_id,
+            user_id: url.user_id,
             origin,
             device
         })
@@ -62,30 +62,30 @@ async function originalURL(req, res){
     }
 }
 
-async function getAllURLs(req, res){
+async function getAllURLs(req, res) {
     const userID = req.user_id
     const page = parseInt(req.query.page) || 0
     const limit = Config.app.pageLimit
     var skip = 0
-    if (page > 0){
+    if (page > 0) {
         skip = page * limit
     }
-    try{
+    try {
         const urls = await URL.find({
-            user_id:userID,
-            is_deleted:false
+            user_id: userID,
+            is_deleted: false
         }).skip(skip).limit(limit)
         return successResponse(res, 200, urls)
-    }catch(error){
+    } catch (error) {
         return errorResponse(res, 500, error.message)
     }
 }
 
-async function getURLsCount(req, res){
+async function getURLsCount(req, res) {
     const userID = req.user_id
     try {
         const count = await URL.countDocuments({
-            user_id:userID
+            user_id: userID
         })
         return successResponse(res, 200, count)
     } catch (error) {
@@ -93,17 +93,17 @@ async function getURLsCount(req, res){
     }
 }
 
-async function deleteURL(req, res){
+async function deleteURL(req, res) {
     const userID = req.user_id
     const shortID = req.params.shortID
     const url = `${req.hostname}/${shortID}`
-    URL.updateOne(
-        {user_id:userID,short_id:shortID},
-        {$set:{is_deleted:true}}
+    await URL.updateOne(
+        { user_id: userID, short_id: shortID },
+        { $set: { is_deleted: true } }
     ).then(result => {
-        if (result.matchedCount == 0){
+        if (result.matchedCount == 0) {
             return errorResponse(res, 400, `${url} doesn't exists`)
-        }else if (result.modifiedCount == 0){
+        } else if (result.modifiedCount == 0) {
             return errorResponse(res, 400, `${url} already deleted`)
         }
         else {

@@ -45,7 +45,7 @@ describe('create user', () => {
         expect(res.json).toHaveBeenCalledWith({ success: true, payload: userInDb._id })
     })
 
-    it('if any field is missing, returns error', async () => {
+    it('returns error if any field is missing', async () => {
         req.body = {
             username: 'john123',
             password: 'testPASS@123',
@@ -60,7 +60,7 @@ describe('create user', () => {
         expect(callArg.success).toBe(false)
     })
 
-    it('if username is invalid, returns error', async () => {
+    it('returns error if username is invalid', async () => {
         req.body = {
             username: 'joh',
             password: 'testPASS@123',
@@ -76,7 +76,7 @@ describe('create user', () => {
         expect(callArg.success).toBe(false)
     })
 
-    it('if password is weak, returns error', async () => {
+    it('returns error if password is weak', async () => {
         req.body = {
             username: 'john123',
             password: 'test',
