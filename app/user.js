@@ -35,7 +35,7 @@ async function updateUser(req, res) {
 
 async function getUser(req, res) {
     const userID = req.user_id
-    User.findById(
+    await User.findById(
         userID,
     ).then(user => {
         if (!user){

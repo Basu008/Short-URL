@@ -14,6 +14,7 @@ function getConnectionURL(dbConfig){
 }
 
 async function closeMongoConnection(){
+    console.log("Closing MongoDB connection...")
     mongoose.disconnect()
 }
 
